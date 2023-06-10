@@ -36,6 +36,83 @@ public class BasicItemController {
         model.addAttribute("item",item);
         return "basic/item";
     }
+    @GetMapping("/add")
+    public String addForm(){
+        return "basic/addForm";
+    }
+
+    //@PostMapping("/add")  //같은 url이지만 method로 역할 구분
+    public String addItemV1(@RequestParam String itemName, @RequestParam int price, @RequestParam Integer quantity,
+                            Model model){
+        Item item = new Item();
+        item.setItemName(itemName);
+        item.setPrice(price);
+        item.setQuantity(quantity);
+
+        itemRepository.save(item);
+
+        model.addAttribute("item", item);
+
+        return "basic/item";
+    }
+
+
+    /**
+     ModelAttribute 사용
+
+     - ModelAttribute는 자동으로 모델에 item을 넣어줌
+     - @ModelAttribute("item")으로 사용했으므로 model에 item이라는 이름으로 들어감
+     */
+    //@PostMapping("/add")
+    public String addItemV2(@ModelAttribute("item") Item item, Model model){
+        itemRepository.save(item);
+
+        //model.addAttribute("item", item);  ModelAttribute는 자동으로 모델에 item을 넣어줌 따라서 생략 가능
+
+        return "basic/item";
+    }
+
+    /**
+     ModelAttribute name 생략 가능
+     */
+    //@PostMapping("/add")
+    public String addItemV3(@ModelAttribute Item item){  //modelattribute에 name을 넣지 않으면 첫글자를 소문자로 변경해서 model에 넣어줌
+
+        itemRepository.save(item);
+
+        return "basic/item";
+    }
+
+
+    /**
+     ModelAttribute 전체 생략
+     */
+    //@PostMapping("/add")
+    public String addItemV4(Item item){  //modelattribute를 생략할 수도 있음
+        itemRepository.save(item);
+        return "basic/item";
+    }
+
+    /**
+     새로 고침 문제 해결
+     */
+    //@PostMapping("/add")
+    public String addItemV5(Item item){  //새로고침 문제 해결
+        itemRepository.save(item);
+        return "redirect:/basic/items/" + item.getId();  //redirect 사용
+    }
+
+    /**
+     고객에게 메시지까지 보여줌
+     redirect 시 status 추가
+     */
+    @PostMapping("/add")
+    public String addItemV6(Item item, RedirectAttributes redirectAttributes){  //알림 추가, 파라미터 추가
+        Item savedItem = itemRepository.save(item);
+        redirectAttributes.addAttribute("itemId", savedItem.getId());
+        redirectAttributes.addAttribute("status", true);
+        return "redirect:/basic/items/{itemId}";  //redirect 사용 -> http://localhost:8080/basic/items/3?status=true  status가 생김
+    }
 
 
     //테스트용 데이터 추가
