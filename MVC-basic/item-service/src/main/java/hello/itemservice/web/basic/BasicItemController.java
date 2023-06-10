@@ -114,6 +114,19 @@ public class BasicItemController {
         return "redirect:/basic/items/{itemId}";  //redirect 사용 -> http://localhost:8080/basic/items/3?status=true  status가 생김
     }
 
+    //수정
+    @GetMapping("/{itemId}/edit")
+    public String editForm(@PathVariable long itemId, Model model){
+        Item item = itemRepository.findById(itemId);
+        model.addAttribute("item", item);
+        return "basic/editForm";
+    }
+    @PostMapping("/{itemId}/edit")
+    public String editSave(@PathVariable long itemId, @ModelAttribute Item item){
+        itemRepository.update(itemId, item);
+        return "redirect:/basic/items/{itemId}";  //redirect 사용 -> url로 이동 controller부터 처음부터 호출됨
+    }
+
 
     //테스트용 데이터 추가
     @PostConstruct
